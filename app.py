@@ -42,7 +42,13 @@ def get_user_input():
             return None
         
         # Ensure user data is in correct shape for the model
-        return np.array(list(user_data.values())).reshape(1, -1)
+        user_input = np.array(list(user_data.values())).reshape(1, -1)
+        
+        # Debug: print user input shape and data
+        print("User input shape:", user_input.shape)
+        print("User input data:", user_input)
+
+        return user_input
 
     except KeyError as e:
         st.error(f"KeyError: {e}. Please check if all the expected columns are present in the label encoders.")
@@ -54,18 +60,20 @@ def get_user_input():
 user_input = get_user_input()
 
 if user_input is not None:
-    if st.button("Predict with KNN"):
-        try:
+    try:
+        # Check if user input shape is correct
+        print("Shape of user input:", user_input.shape)
+
+        # Proceed with scaling and prediction
+        if st.button("Predict with KNN"):
             scaled_input = scaler.transform(user_input)  # Scale input data
             result = knn_model.predict(scaled_input)  # Predict with KNN model
             st.write("Prediction (KNN):", "Income >50K" if result[0] == 1 else "Income <=50K")
-        except ValueError as e:
-            st.error(f"Error in KNN prediction: {e}")
-    
-    if st.button("Predict with Decision Tree"):
-        try:
+
+        if st.button("Predict with Decision Tree"):
             scaled_input = scaler.transform(user_input)  # Scale input data
             result = decision_tree_model.predict(scaled_input)  # Predict with Decision Tree model
             st.write("Prediction (Decision Tree):", "Income >50K" if result[0] == 1 else "Income <=50K")
-        except ValueError as e:
-            st.error(f"Error in Decision Tree prediction: {e}")
+
+    except ValueError as e:
+        st.error(f"Error in scaling or prediction: {e}")
