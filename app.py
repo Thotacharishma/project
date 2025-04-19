@@ -7,7 +7,7 @@ knn_model = joblib.load("knn_model.pkl")
 decision_tree_model = joblib.load("decision_tree_model.pkl")
 scaler = joblib.load("scaler.pkl")
 label_encoders = joblib.load("label_encoders.pkl")
-
+st.write("Available keys in label_encoders:", label_encoders.keys())
 st.title("Income Prediction App")
 
 def get_user_input():
