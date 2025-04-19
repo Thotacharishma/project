@@ -7,7 +7,7 @@ knn_model = joblib.load("knn_model.pkl")
 decision_tree_model = joblib.load("decision_tree_model.pkl")
 scaler = joblib.load("scaler.pkl")
 label_encoders = joblib.load("label_encoders.pkl")
-st.write("Available keys in label_encoders:", label_encoders.keys())
+#st.write("Available keys in label_encoders:", label_encoders.keys())
 st.title("Income Prediction App")
 
 def get_user_input():
@@ -16,7 +16,7 @@ def get_user_input():
         age = int(st.number_input("Age", 17, 90))
         workclass = st.selectbox("Workclass", label_encoders['workclass'].classes_)
         education = st.selectbox("Education", label_encoders['education'].classes_)
-        marital_status = st.selectbox("Marital Status", label_encoders['marital-status'].classes_)
+        marital_status = st.selectbox("Marital Status", label_encoders['marital_status'].classes_)
         occupation = st.selectbox("Occupation", label_encoders['occupation'].classes_)
         relationship = st.selectbox("Relationship", label_encoders['relationship'].classes_)
         race = st.selectbox("Race", label_encoders['race'].classes_)
@@ -28,7 +28,7 @@ def get_user_input():
             'age': age,
             'workclass': label_encoders['workclass'].transform([workclass])[0],
             'education': label_encoders['education'].transform([education])[0],
-            'marital-status': label_encoders['marital-status'].transform([marital_status])[0],
+            'marital-status': label_encoders['marital_status'].transform([marital_status])[0],
             'occupation': label_encoders['occupation'].transform([occupation])[0],
             'relationship': label_encoders['relationship'].transform([relationship])[0],
             'race': label_encoders['race'].transform([race])[0],
