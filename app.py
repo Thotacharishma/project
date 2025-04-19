@@ -12,21 +12,23 @@ st.title("Income Prediction App")
 
 def get_user_input():
     try:
-        age = st.number_input("Age", 17, 90)
+        # Collect user input for each feature
+        age = int(st.number_input("Age", 17, 90))
         workclass = st.selectbox("Workclass", label_encoders['workclass'].classes_)
         education = st.selectbox("Education", label_encoders['education'].classes_)
-        marital_status = st.selectbox("Marital Status", label_encoders['marital_status'].classes_)  # Updated key name
+        marital_status = st.selectbox("Marital Status", label_encoders['marital-status'].classes_)
         occupation = st.selectbox("Occupation", label_encoders['occupation'].classes_)
         relationship = st.selectbox("Relationship", label_encoders['relationship'].classes_)
         race = st.selectbox("Race", label_encoders['race'].classes_)
         sex = st.selectbox("Sex", label_encoders['sex'].classes_)
-        hours_per_week = st.number_input("Hours per Week", 1, 100)
+        hours_per_week = int(st.number_input("Hours per Week", 1, 100))
 
+        # Transform categorical values using label encoders
         user_data = {
             'age': age,
             'workclass': label_encoders['workclass'].transform([workclass])[0],
             'education': label_encoders['education'].transform([education])[0],
-            'marital-status': label_encoders['marital_status'].transform([marital_status])[0],  # Updated key name
+            'marital-status': label_encoders['marital-status'].transform([marital_status])[0],
             'occupation': label_encoders['occupation'].transform([occupation])[0],
             'relationship': label_encoders['relationship'].transform([relationship])[0],
             'race': label_encoders['race'].transform([race])[0],
@@ -34,21 +36,36 @@ def get_user_input():
             'hours-per-week': hours_per_week
         }
 
+        # Check if any value is missing or None
+        if None in user_data.values():
+            st.error("Please fill in all fields correctly.")
+            return None
+        
+        # Ensure user data is in correct shape for the model
         return np.array(list(user_data.values())).reshape(1, -1)
-    
+
     except KeyError as e:
         st.error(f"KeyError: {e}. Please check if all the expected columns are present in the label encoders.")
         return None
-
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {e}")
+        return None
 
 user_input = get_user_input()
 
-if st.button("Predict with KNN"):
-    scaled_input = scaler.transform(user_input)
-    result = knn_model.predict(scaled_input)
-    st.write("Prediction (KNN):", "Income >50K" if result[0] == 1 else "Income <=50K")
-
-if st.button("Predict with Decision Tree"):
-    scaled_input = scaler.transform(user_input)
-    result = decision_tree_model.predict(scaled_input)
-    st.write("Prediction (Decision Tree):", "Income >50K" if result[0] == 1 else "Income <=50K")
+if user_input is not None:
+    if st.button("Predict with KNN"):
+        try:
+            scaled_input = scaler.transform(user_input)  # Scale input data
+            result = knn_model.predict(scaled_input)  # Predict with KNN model
+            st.write("Prediction (KNN):", "Income >50K" if result[0] == 1 else "Income <=50K")
+        except ValueError as e:
+            st.error(f"Error in KNN prediction: {e}")
+    
+    if st.button("Predict with Decision Tree"):
+        try:
+            scaled_input = scaler.transform(user_input)  # Scale input data
+            result = decision_tree_model.predict(scaled_input)  # Predict with Decision Tree model
+            st.write("Prediction (Decision Tree):", "Income >50K" if result[0] == 1 else "Income <=50K")
+        except ValueError as e:
+            st.error(f"Error in Decision Tree prediction: {e}")
